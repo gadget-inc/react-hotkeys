@@ -1,3 +1,11 @@
+// Since Loggers are lazily instantiated, sometimes they get created on the
+// singleton objects during one of the React render phases where console
+// logging is disabled. React does this to suppress console logs, but Logger
+// can accidentally leak that disabled logger out into the global react-hotkeys
+// state. So this captures a reference to a real logger to use.
+const consoleRef = console;
+
+
 /**
  * Encapsulates all logging behaviour and provides the ability to specify the level
  * of logging desired.
@@ -66,7 +74,7 @@ class Logger {
         return;
       }
 
-      this[level] = ['debug', 'verbose'].indexOf(level) === -1 ? console[level] : console.log;
+      this[level] = ['debug', 'verbose'].indexOf(level) === -1 ? consoleRef[level] : consoleRef.log;
     }
   }
 }
